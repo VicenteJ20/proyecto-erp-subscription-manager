@@ -1,7 +1,7 @@
 import { auth } from "@/auth"
+import ReduxProvider from "@/providers/ReduxProvider"
 import { SessionProvider } from "next-auth/react"
-import { store } from "../../redux/store"
-import { Provider } from "react-redux"
+
 
 export default async function ConfigurationAccountLayout(
   { children }: { children: React.ReactNode }
@@ -10,9 +10,9 @@ export default async function ConfigurationAccountLayout(
 
   return (
     <SessionProvider session={session}>
-      <Provider store={store}>
+      <ReduxProvider>
         {children}
-      </Provider>
+      </ReduxProvider>
     </SessionProvider >
   )
 }
