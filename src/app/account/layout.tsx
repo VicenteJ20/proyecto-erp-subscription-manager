@@ -1,7 +1,7 @@
 import { auth } from "@/auth"
 import ReduxProvider from "@/providers/ReduxProvider"
 import { SessionProvider } from "next-auth/react"
-
+import { SideBarStage } from "@/components/config/SideBarStage"
 
 export default async function ConfigurationAccountLayout(
   { children }: { children: React.ReactNode }
@@ -11,7 +11,10 @@ export default async function ConfigurationAccountLayout(
   return (
     <SessionProvider session={session}>
       <ReduxProvider>
-        {children}
+        <section className='min-h-screen flex items-center justify-center bg-white'>
+          <SideBarStage />
+          {children}
+        </section>
       </ReduxProvider>
     </SessionProvider >
   )
