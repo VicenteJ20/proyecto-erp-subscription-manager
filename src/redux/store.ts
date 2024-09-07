@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import accountSlice from './features/account/accountSlice'
+import stageSlice from './features/account/stageSlice'
 
 export const store = configureStore({
   reducer: {
-    account: accountSlice
+    account: accountSlice,
+    currentStage: stageSlice
   }
 })
 
