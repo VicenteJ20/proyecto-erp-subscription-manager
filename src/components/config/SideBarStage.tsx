@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { useSelector } from 'react-redux'
 
-const stages = [
+export const stages = [
   {
     id: 0,
     title: 'Información personal',
@@ -33,7 +33,7 @@ const stages = [
 
 const SideBarStage = () => {
   const currentStage = useSelector((state: any) => state.currentStage)
-  console.log(currentStage)
+
   return (
     <aside className='bg-zinc-100 fixed left-0 bottom-0 w-[30rem] top-0 p-12'>
       <header className={`flex flex-row gap-2 items-center mb-4`}>
