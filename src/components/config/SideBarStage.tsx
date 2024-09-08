@@ -47,7 +47,7 @@ const SideBarStage = () => {
             stages && stages.length > 0 && stages.map((item, index) => (
               <li key={index} className='flex flex-row gap-x-4 items-start mt-1'>
                 <Avatar>
-                  <AvatarFallback  className={`${currentStage.stage > item.id ? 'bg-green-600' : currentStage.stage === item.id ? 'bg-yellow-500' : currentStage.stage < item.id && 'bg-zinc-500'}`}>
+                  <AvatarFallback  className={`${currentStage.stage > item.id ? 'bg-green-600' : currentStage.stage === item.id ? 'bg-yellow-500' : currentStage.stage < item.id && 'bg-zinc-200 text-zinc-800'}`}>
                     {item.id + 1}
                   </AvatarFallback>
                 </Avatar>
