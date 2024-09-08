@@ -4,7 +4,8 @@ import type { PayloadAction } from "@reduxjs/toolkit"
 export interface AccountStateProps {
   manager: {
     name: string,
-    email: string
+    email: string,
+    phone: string,
   },
   company: {
     email: string,
@@ -53,7 +54,8 @@ export interface AccountStateProps {
 const initialState: AccountStateProps = {
   manager: {
     name: '',
-    email: ''
+    email: '',
+    phone: '',
   },
   company: {
     email: '',
