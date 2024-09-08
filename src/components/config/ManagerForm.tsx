@@ -3,19 +3,20 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z, infer as zInfer } from 'zod'
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, Form } from "@/components/ui/form";
+import { FormControl, FormField, FormItem, FormLabel, Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
-import { RiArrowRightFill, RiArrowRightLine } from "@remixicon/react";
+import { useDispatch } from "react-redux";
+import { setManager } from "@/redux/features/account/accountSlice";
 
 
 const formSchema = z.object({
   email: z.string().email({ message: 'La dirección de correo electrónico no es válida' }),
-  name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres' }) ,
+  name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres' }),
   phone: z.string().min(11, { message: 'El teléfono debe tener al menos 11 caracteres' }),
 })
 
 export function ManagerForm({ email }: { email?: string }) {
+  const dispatch = useDispatch()
 
   const form = useForm<zInfer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -27,7 +28,11 @@ export function ManagerForm({ email }: { email?: string }) {
   })
 
   async function onSubmit(values: zInfer<typeof formSchema>) {
-    alert(JSON.stringify(values, null, 2))
+    dispatch(setManager({
+      email: values.email,
+      name: values.name,
+      phone: values.phone
+    }))
   }
 
   const fields = [
@@ -48,22 +53,20 @@ export function ManagerForm({ email }: { email?: string }) {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-4'>
+        <form id='managerForm' onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-4 h-full'>
           {
             fields && fields.length > 0 && fields.map((item, index) => (
               <FormField control={form.control} name={item.name} key={index}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='font-semibold'>{item.label}</FormLabel>
+                    <FormLabel className='font-medium'>{item.label}</FormLabel>
                     <FormControl>
-                      <Input placeholder={item.placeholder} {...field} className='bg-white mx-0' />
+                      <Input placeholder={item.placeholder} {...field} className='bg-white mx-0 rounded-sm ' />
                     </FormControl>
-                    <FormDescription className={`${ form.formState.errors[item.name]?.message ? 'text-red-500' : 'text-zinc-600'}`}>{form.formState.errors[item.name]?.message || item.message}</FormDescription>
                   </FormItem>
                 )} />
             ))
           }
-          <Button type='submit' className='p-5 text-base font-medium bg-teal-600 hover:bg-teal-700'><span className='mr-1'>Continuar </span> <RiArrowRightLine /></Button>
         </form>
       </Form>
     </>
