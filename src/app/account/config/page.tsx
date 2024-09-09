@@ -4,6 +4,7 @@ import { auth } from "@/auth"
 
 const ConfigurationPage = async () => {
   const session = await auth()
+  console.log('session', session)
   return (
     <section className='max-h-full py-12 flex flex-col gap-6'>
       <HeaderStepAccount title='Información personal' description='Te damos la bienvenida a EPYME, necesitamos más información para continuar con la configuración de su cuenta.' />
