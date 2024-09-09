@@ -117,9 +117,12 @@ export const accountSlice = createSlice({
     },
     setSubscription: (state, action: PayloadAction<AccountStateProps['subscription']>) => {
       state.subscription = action.payload
-    }
+    },
+    setColorTheme: (state, action: PayloadAction<string>) => {
+      state.theme.mainColor = action.payload
+    },
   }
 })
 
-export const { setManager, setCompany, setTheme, setSubscription } = accountSlice.actions
+export const { setManager, setCompany, setTheme, setSubscription, setColorTheme } = accountSlice.actions
 export default accountSlice.reducer
