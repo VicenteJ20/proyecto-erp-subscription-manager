@@ -7,6 +7,8 @@ import { FormControl, FormField, FormItem, FormLabel, Form } from "@/components/
 import { Input } from "@/components/ui/input";
 import { useDispatch } from "react-redux";
 import { setManager } from "@/redux/features/account/accountSlice";
+import { useRouter } from "next/navigation";
+import { increment } from "@/redux/features/account/stageSlice";
 
 
 const formSchema = z.object({
@@ -17,6 +19,7 @@ const formSchema = z.object({
 
 export function ManagerForm({ email }: { email?: string }) {
   const dispatch = useDispatch()
+  const router = useRouter()
 
   const form = useForm<zInfer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,6 +36,11 @@ export function ManagerForm({ email }: { email?: string }) {
       name: values.name,
       phone: values.phone
     }))
+
+    if (values.email !== '' && values.name !== '' && values.phone !== '') {
+      dispatch(increment())
+      router.push('/account/config/info-pyme')
+    }
   }
 
   const fields = [
