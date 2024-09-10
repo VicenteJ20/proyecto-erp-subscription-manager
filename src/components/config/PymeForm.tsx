@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { setCompany, setManager } from "@/redux/features/account/accountSlice";
 import { useRouter } from "next/navigation";
 import { increment } from "@/redux/features/account/stageSlice";
+import { useEffect } from "react";
 
 
 const formSchema = z.object({
@@ -19,7 +20,8 @@ const formSchema = z.object({
   city: z.string().min(3, { message: 'La ciudad debe tener al menos 3 caracteres' }),
   country: z.string().min(3, { message: 'El país debe tener al menos 3 caracteres' }),
   postalCode: z.string().min(3, { message: 'El código postal debe tener al menos 3 caracteres' }),
-  website: z.string().min(3, { message: 'El sitio web debe tener al menos 3 caracteres' })
+  website: z.string().min(3, { message: 'El sitio web debe tener al menos 3 caracteres' }),
+  domain: z.string().min(3, { message: 'El dominio debe tener al menos 3 caracteres' })
 })
 
 export function PymeForm() {
@@ -36,7 +38,8 @@ export function PymeForm() {
       city: '',
       country: '',
       postalCode: '',
-      website: ''
+      website: '',
+      domain: ''
     }
   })
 
@@ -49,7 +52,8 @@ export function PymeForm() {
       city: values.city,
       country: values.country,
       postalCode: values.postalCode,
-      website: values.website
+      website: values.website,
+      domain: values.domain
     }))
 
     if (values.email !== '' && values.name !== '' && values.phone !== '' && values.address !== '' && values.city !== '' && values.country !== '' && values.postalCode !== '' && values.website !== '') {
@@ -67,7 +71,7 @@ export function PymeForm() {
     {
       name: 'email',
       label: 'Correo electrónico de la empresa',
-      placeholder: 'Ej: epyme@epyme.cl',
+      placeholder: 'Ej: epyme@epyme.app',
     },
     {
       name: 'phone',
@@ -97,9 +101,22 @@ export function PymeForm() {
     {
       name: 'website',
       label: 'Sitio web',
-      placeholder: 'Ej: https://www.epyme.cl',
+      placeholder: 'Ej: https://www.epyme.app',
     },
+    {
+      name: 'domain',
+      label: 'Dominio',
+      placeholder: 'Ej: epyme.app',
+    }
   ]
+
+  const defaultDomain = process.env.NEXT_PUBLIC_DEFAULT_DOMAIN as string
+
+  useEffect(() => {
+    const name = form.watch('name')
+    const domain = name.toLowerCase().replace(/\s/g, '')
+    form.setValue('domain', `${domain}.${defaultDomain}`)
+  }, [form.watch('name')])
 
   return (
     <>
@@ -109,10 +126,10 @@ export function PymeForm() {
             fields && fields.length > 0 && fields.map((item: any, index) => (
               <FormField control={form.control} name={item.name} key={index}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={`${item.name === 'domain' ? 'col-span-2' : 'col-span-1'}`}>
                     <FormLabel className='font-medium'>{item.label}</FormLabel>
                     <FormControl>
-                      <Input placeholder={item.placeholder} {...field} className='bg-white mx-0 rounded-sm ' />
+                      <Input placeholder={item.placeholder} {...field} className={`bg-white mx-0 rounded-sm`} disabled={item.name === 'domain'} />
                     </FormControl>
                   </FormItem>
                 )} />
