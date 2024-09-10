@@ -17,6 +17,7 @@ export interface AccountStateProps {
     postalCode: string,
     website?: string,
     logo?: string,
+    domain: string,
   },
   theme: {
     mainColor: string,
@@ -67,6 +68,7 @@ const initialState: AccountStateProps = {
     postalCode: '',
     website: '',
     logo: '',
+    domain: '',
   },
   theme: {
     mainColor: '',
@@ -121,8 +123,11 @@ export const accountSlice = createSlice({
     setColorTheme: (state, action: PayloadAction<string>) => {
       state.theme.mainColor = action.payload
     },
+    setLogoUrl: (state, action: PayloadAction<string>) => {
+      state.company.logo = action.payload
+    },
   }
 })
 
-export const { setManager, setCompany, setTheme, setSubscription, setColorTheme } = accountSlice.actions
+export const { setManager, setCompany, setTheme, setSubscription, setColorTheme, setLogoUrl } = accountSlice.actions
 export default accountSlice.reducer
