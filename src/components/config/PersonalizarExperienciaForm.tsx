@@ -10,6 +10,7 @@ import { setCompany, setTheme } from "@/redux/features/account/accountSlice";
 import { useRouter } from "next/navigation";
 import { increment } from "@/redux/features/account/stageSlice";
 import SimpleColorSelector from "./ColorPicker";
+import FileUpload from "./FileUpload";
 
 
 const formSchema = z.object({
@@ -22,7 +23,7 @@ const formSchema = z.object({
 export function ExperiencePymeForm() {
   const dispatch = useDispatch()
   const router = useRouter()
-  
+
   const form = useForm<zInfer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,30 +51,49 @@ export function ExperiencePymeForm() {
       name: 'mainColor',
       label: 'Color primario de su marca o PYME',
       placeholder: 'Ej: #FFFFFF',
+    },
+    {
+      name: 'file',
+      label: 'Logo de su empresa',
+      placeholder: 'Ej: https://www.example.com/logo.png',
+      type: 'file',
     }
   ]
+
+  const handleFileSelect = (file: File) => {
+    console.log('Archivo seleccionado:', file);
+  };
+
 
   return (
     <>
       <Form {...form}>
-        <form id='experienceForm' onSubmit={form.handleSubmit(onSubmit)} className='grid grid-cols-1 lg:grid-cols-2 gap-4 h-full'>
+        <form id='experienceForm' onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-4 h-full'>
           {
             fields && fields.length > 0 && fields.map((item: any, index) => (
               <FormField control={form.control} name={item.name} key={index}
-                render={({ field }) : any => {
+                render={({ field }): any => {
                   if (field.name === 'mainColor') {
                     return (
                       <FormItem>
                         <SimpleColorSelector />
                       </FormItem>
                     )
+                  } else if (field.name === 'file') {
+                    return (
+                      <FormItem>
+                        <FileUpload label={item.label} onFileSelect={handleFileSelect} />
+                      </FormItem>
+                    );
                   } else {
-                    <FormItem>
-                      <FormLabel className='font-medium'>{item.label}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={item.placeholder} {...field} className='bg-white mx-0 rounded-sm ' />
-                      </FormControl>
-                    </FormItem>
+                    return (
+                      <FormItem>
+                        <FormLabel className='font-medium'>{item.label}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={item.placeholder} {...field} className='bg-white mx-0 rounded-sm ' />
+                        </FormControl>
+                      </FormItem>
+                    )
                   }
                 }} />
             ))
