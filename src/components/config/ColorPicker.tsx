@@ -44,7 +44,7 @@ export default function SimpleColorSelector() {
   }, [])
 
   return (
-    <div className="flex items-center space-x-4 max-w-md mx-auto">
+    <div className="flex items-end">
       <Input
         type="color"
         value={color}
@@ -52,8 +52,8 @@ export default function SimpleColorSelector() {
         className="w-12 h-12 p-1 rounded cursor-pointer border-none"
         aria-label="Selector de color"
       />
-      <div className="flex-grow">
-        <Label htmlFor="rgb-value" className="text-sm font-medium text-muted-foreground">
+      <div className="flex-grow flex flex-col gap-2">
+        <Label htmlFor="rgb-value" className="text-sm font-medium text-muted-foreground text-zinc-900">
           Color principal de su PYME o marca
         </Label>
         <Input
@@ -61,7 +61,7 @@ export default function SimpleColorSelector() {
           type="text"
           value={rgbValue}
           onChange={handleRgbChange}
-          className="font-mono"
+          className="font-mono bg-white rounded-sm"
           placeholder="rgb(255, 0, 0)"
         />
       </div>
