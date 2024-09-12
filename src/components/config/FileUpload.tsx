@@ -1,100 +1,117 @@
 import React, { useState } from 'react';
-import { Button } from '../ui/button';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Label } from '@radix-ui/react-label';
 import Image from 'next/image';
-import { Card, CardContent } from '../ui/card';
-import { Input } from '../ui/input';
+import { Card } from '../ui/card';
 
-interface FileUploadProps {
-  label: string;
-  onFileSelect: (file: File) => void;
-}
+export default function ImageUploader({ label }: { label: string }) {
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-const FileUpload: React.FC<FileUploadProps> = ({ label, onFileSelect }) => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Validar tipo de archivo
-      const validTypes = ['image/png', 'image/jpeg', 'image/svg+xml'];
-      if (!validTypes.includes(file.type)) {
-        setError('Solo se permiten archivos .png, .jpg y .svg');
-        return;
-      }
-
-      // Validar tamaño del archivo (máximo 1MB)
-      const maxSizeInBytes = 1 * 1024 * 1024; // 1MB
-      if (file.size > maxSizeInBytes) {
-        setError('El archivo no debe pesar más de 1MB');
-        return;
-      }
-
-      setSelectedFile(file);
-      setError(null);
-      onFileSelect(file);
-
-      // Crear URL de previsualización
-      const fileUrl = URL.createObjectURL(file);
-      console.log('fileUrl:', fileUrl);
-      setPreviewUrl(fileUrl);
-
-      // Enviar archivo al backend
-      const formData = new FormData();
-      formData.append('file', file);
-
-      try {
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          body: formData,
-        });
-        const data = await response.json();
-        console.log('Archivo subido:', data.filePath);
-      } catch (error) {
-        console.error('Error al subir el archivo:', error);
-        setError('Error al subir el archivo');
-      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleRemoveFile = () => {
-    setSelectedFile(null);
-    setPreviewUrl(null);
-    setError(null);
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    if (!file) {
+      setMessage('Por favor selecciona una imagen');
+      return;
+    }
+
+    setUploading(true);
+    setMessage('');
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('/api/images/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const debugInfo = `
+        Status: ${response.status}
+        StatusText: ${response.statusText}
+        Headers: ${JSON.stringify(Object.fromEntries(response.headers))}
+      `;
+
+      const responseText = await response.text();
+
+      if (!responseText) {
+        throw new Error('Empty response from server');
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error(`Failed to parse server response: ${responseText}`);
+      }
+
+      if (response.ok) {
+        setMessage('Imagen cargada exitosamente: ' + data.message);
+      } else {
+        setMessage('Error al cargar la imagen: ' + (data.message || 'Unknown error'));
+      }
+    } catch (error: any) {
+      setMessage('Error: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
-  return (
-    <Card className="file-upload p-4 border border-gray-300 rounded-md shadow-sm">
-      <label className="file-upload-label block text-sm font-medium text-gray-700 mb-2">{label}</label>
-      <Input 
-        type="file" 
-        accept=".png,.jpg,.jpeg,.svg" 
-        onChange={handleFileChange} 
-        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
-        placeholder='Haga clic para cargar su archivo'
-      />
-      {selectedFile && <p className="mt-2 text-sm text-gray-600">Archivo seleccionado: {selectedFile.name}</p>}
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-      {previewUrl && (
-        <CardContent className="relative mt-4 w-fit">
-          <p className="text-sm text-gray-600">Previsualización:</p>
-          <div className="relative">
-            <Image width={150} height={150} src={previewUrl} alt="Previsualización" className="mt-2 max-w-full h-auto border border-gray-300 rounded-md" />
-            <Button 
-              onClick={handleRemoveFile} 
-              className="absolute top-0 h-6 w-6 text-lg right-0 mt-2 mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-700 focus:outline-none"
-            >
-              &times;
-            </Button>
-          </div>
-        </CardContent>
-      )}
-    </Card>
-  );
-};
 
-export default FileUpload;
+  return (
+    <div className="flex flex-row-reverse gap-12 items-center justify-end">
+
+      <div className='flex flex-col gap-2.5 '>
+        <Label htmlFor="file">{label}</Label>
+        <Input
+          type="file"
+          onChange={handleFileChange}
+          accept="image/*"
+          disabled={uploading}
+          className='bg-white'
+        />
+        <Button onClick={handleSubmit} type="submit" disabled={uploading}>
+          {uploading ? 'Cargando...' : 'Subir Imagen'}
+        </Button>
+
+        {message && (
+          <Alert className="mt-4">
+            <AlertDescription>{message}</AlertDescription>
+          </Alert>
+        )}
+
+      </div>
+      <div className='flex flex-col gap-2'>
+        <Label className='font-medium'>Vista previa de su logo</Label>
+        <Card className='p-4 h-42 w-48'>
+          {imagePreview ? (
+            <div style={{ flex: 1, textAlign: 'center' }}>
+              <Image width={150} height={150} src={imagePreview} alt="Vista previa" style={{ maxWidth: '100%' }} />
+            </div>
+          ) : (
+            <div className='h-36 w-40 flex items-center justify-center text-gray-400'>
+              <p style={{ flex: 1, textAlign: 'center' }}>Aquí verá su logo cuando lo cargue</p>
+            </div>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
+}
