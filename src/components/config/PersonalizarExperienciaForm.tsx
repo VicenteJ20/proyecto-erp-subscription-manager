@@ -60,10 +60,6 @@ export function ExperiencePymeForm() {
     }
   ]
 
-  const handleFileSelect = (file: File) => {
-    console.log('Archivo seleccionado:', file);
-  };
-
 
   return (
     <>
@@ -82,7 +78,7 @@ export function ExperiencePymeForm() {
                   } else if (field.name === 'file') {
                     return (
                       <FormItem>
-                        <FileUpload label={item.label} onFileSelect={handleFileSelect} />
+                        <FileUpload label={item.label} />
                       </FormItem>
                     );
                   } else {
