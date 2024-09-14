@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import path from "path"
 import { writeFile } from "fs/promises"
 import { auth } from "@/auth"
+import { promises as fs } from "fs"
 
 export const config = {
   api: {
@@ -11,9 +12,10 @@ export const config = {
 
 export const POST = auth(async (req) => {
   const session = req.auth
+  const mainRoute = process.env.MAIN_ROUTE as string
 
   try {
-    const formData = await req.formData()
+    const formData  = await req.formData()
     const image = formData.get('image') as any
 
     if (!image) {
@@ -22,13 +24,24 @@ export const POST = auth(async (req) => {
 
     const buffer = await image.arrayBuffer()
     const filename = image.name.replaceAll(" ", "_")
-
+    const company = formData.get('company') as string
+    
     try {
-      await writeFile(
-        path.join(process.cwd(), 'public/assets/images', filename),
+
+      if (!company) {
+        return NextResponse.json({ message: "No company name provided" }, { status: 400 })
+      }
+
+      const companyFolder = path.join(process.cwd(), mainRoute, company);
+
+
+      await fs.mkdir(companyFolder, { recursive: true });
+
+      await fs.writeFile(
+        path.join(companyFolder, filename),
         Buffer.from(buffer)
       )
-      return NextResponse.json({ message: "Upload successful" }, { status: 201 })
+      return NextResponse.json({ message: "Upload successful", url: `${mainRoute}/${filename}` }, { status: 201 })
     } catch (error: any) {
       console.error("Error writing file:", error)
       return NextResponse.json({ message: "Upload failed", error: error.message }, { status: 500 })
