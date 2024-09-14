@@ -6,6 +6,7 @@ import { Label } from '@radix-ui/react-label';
 import Image from 'next/image';
 import { Card } from '../ui/card';
 import { useDispatch, useSelector } from 'react-redux';
+import { setLogoUrl } from '@/redux/features/account/accountSlice';
 
 export default function ImageUploader({ label }: { label: string }) {
   const [file, setFile] = useState<File | null>(null);
@@ -53,7 +54,7 @@ export default function ImageUploader({ label }: { label: string }) {
       let data;
       try {
         data = JSON.parse(responseText);
-        console.log(data)
+        dispatch(setLogoUrl(response.url));
       } catch (parseError) {
         throw new Error(`Failed to parse server response: ${responseText}`);
       }
@@ -63,8 +64,6 @@ export default function ImageUploader({ label }: { label: string }) {
       } else {
         setMessage('Error al cargar la imagen: ' + (data.message || 'Unknown error'));
       }
-      console.log(experience);
-      console.log(color);
     } catch (error: any) {
       setMessage('Error: ' + error.message);
     } finally {
