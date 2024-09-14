@@ -5,12 +5,16 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@radix-ui/react-label';
 import Image from 'next/image';
 import { Card } from '../ui/card';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function ImageUploader({ label }: { label: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  const experience = useSelector((state: any) => state.account.company);
+  const color = useSelector((state: any) => state.account.theme);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -36,6 +40,7 @@ export default function ImageUploader({ label }: { label: string }) {
 
     try {
       const formData = new FormData();
+      formData.append('company', experience.name)
       formData.append('image', file);
 
       const response = await fetch('/api/images/upload', {
@@ -48,6 +53,7 @@ export default function ImageUploader({ label }: { label: string }) {
       let data;
       try {
         data = JSON.parse(responseText);
+        console.log(data)
       } catch (parseError) {
         throw new Error(`Failed to parse server response: ${responseText}`);
       }
@@ -57,6 +63,8 @@ export default function ImageUploader({ label }: { label: string }) {
       } else {
         setMessage('Error al cargar la imagen: ' + (data.message || 'Unknown error'));
       }
+      console.log(experience);
+      console.log(color);
     } catch (error: any) {
       setMessage('Error: ' + error.message);
     } finally {
