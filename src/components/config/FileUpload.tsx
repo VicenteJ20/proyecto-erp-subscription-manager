@@ -1,30 +1,30 @@
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@radix-ui/react-label';
 import Image from 'next/image';
 import { Card } from '../ui/card';
 
 export default function ImageUploader({ label }: { label: string }) {
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(selectedFile);
     }
   };
 
-
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
       setMessage('Por favor selecciona una imagen');
@@ -43,17 +43,7 @@ export default function ImageUploader({ label }: { label: string }) {
         body: formData,
       });
 
-      const debugInfo = `
-        Status: ${response.status}
-        StatusText: ${response.statusText}
-        Headers: ${JSON.stringify(Object.fromEntries(response.headers))}
-      `;
-
       const responseText = await response.text();
-
-      if (!responseText) {
-        throw new Error('Empty response from server');
-      }
 
       let data;
       try {
@@ -74,10 +64,8 @@ export default function ImageUploader({ label }: { label: string }) {
     }
   };
 
-
   return (
     <div className="flex flex-row-reverse gap-12 items-center justify-end">
-
       <div className='flex flex-col gap-2.5 '>
         <Label htmlFor="file">{label}</Label>
         <Input
@@ -96,7 +84,6 @@ export default function ImageUploader({ label }: { label: string }) {
             <AlertDescription>{message}</AlertDescription>
           </Alert>
         )}
-
       </div>
       <div className='flex flex-col gap-2'>
         <Label className='font-medium'>Vista previa de su logo</Label>
