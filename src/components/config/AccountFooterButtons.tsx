@@ -52,7 +52,6 @@ const isPreviousStageComplete = (slice: string, previousSlice: any) => {
 
   if (slice === 'experience') {
     const isComplete = Object.values(previousSlice).every((value: any) => value !== '');
-    console.log(previousSlice)
     return isComplete;
   }
   return true
