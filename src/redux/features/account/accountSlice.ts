@@ -21,7 +21,6 @@ export interface AccountStateProps {
   },
   theme: {
     mainColor: string,
-    fontFamily: string,
     estimatedUsers: string,
   },
   subscription: {
@@ -72,7 +71,6 @@ const initialState: AccountStateProps = {
   },
   theme: {
     mainColor: '',
-    fontFamily: '',
     estimatedUsers: '',
   },
   subscription: {
@@ -126,8 +124,11 @@ export const accountSlice = createSlice({
     setLogoUrl: (state, action: PayloadAction<string>) => {
       state.company.logo = action.payload
     },
+    setEstimatedUsers: (state, action: PayloadAction<string>) => {
+      state.theme.estimatedUsers = action.payload
+    }
   }
 })
 
-export const { setManager, setCompany, setTheme, setSubscription, setColorTheme, setLogoUrl } = accountSlice.actions
+export const { setManager, setCompany, setTheme, setSubscription, setColorTheme, setLogoUrl, setEstimatedUsers } = accountSlice.actions
 export default accountSlice.reducer
