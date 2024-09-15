@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import path from "path"
-import { writeFile } from "fs/promises"
 import { auth } from "@/auth"
 import { promises as fs } from "fs"
 
@@ -41,7 +40,7 @@ export const POST = auth(async (req) => {
         path.join(companyFolder, filename),
         Buffer.from(buffer)
       )
-      return NextResponse.json({ message: "Upload successful", url: `${mainRoute}/${filename}` }, { status: 201 })
+      return NextResponse.json({ message: "Upload successful", url: `${mainRoute}/${company}/${filename}` }, { status: 201 })
     } catch (error: any) {
       console.error("Error writing file:", error)
       return NextResponse.json({ message: "Upload failed", error: error.message }, { status: 500 })
