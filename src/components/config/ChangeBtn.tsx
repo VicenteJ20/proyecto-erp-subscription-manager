@@ -19,7 +19,7 @@ const ChangeBtn = ({id}: { id: string}) => {
       <Button onClick={() => handleExternalSubmit(id)} size='lg' className='px-4 py-4 bg-teal-600 text-white border border-teal-500 text-base hover:text-white'>
         {currentStage === 4 ? 'Confirmar' : 'Siguiente'}
       </Button>
-      <Button size='lg' className='px-4 py-4 bg-white text-black border border-zinc-100 text-base hover:text-white'>
+      <Button size='lg' onClick={handleBack} className='px-4 py-4 bg-white text-black border border-zinc-100 text-base hover:text-white'>
         Volver
       </Button>
     </section>
