@@ -6,7 +6,7 @@ import { z, infer as zInfer } from 'zod'
 import { FormControl, FormField, FormItem, FormLabel, Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useDispatch, useSelector } from "react-redux";
-import { setCompany, setTheme } from "@/redux/features/account/accountSlice";
+import { setCompany, setEstimatedUsers, setTheme } from "@/redux/features/account/accountSlice";
 import { useRouter } from "next/navigation";
 import { increment } from "@/redux/features/account/stageSlice";
 import SimpleColorSelector from "./ColorPicker";
@@ -14,33 +14,26 @@ import FileUpload from "./FileUpload";
 
 
 const formSchema = z.object({
-  mainColor: z.string({ message: 'Debe seleccionar el color primario de su marca o PYME.' }),
-  fontFamily: z.string({ message: 'Debe seleccionar la fuente de su marca o PYME.' }),
-  logo: z.string({ message: 'Debe cargar el logo de su empresa' }),
-  estimatedUsers: z.number({ message: 'Debe ingresar la cantidad de colaboradores estimados que usarán el sistema.' }),
+   estimatedUsers: z.string({ message: 'Debe ingresar la cantidad de colaboradores estimados' }),
 })
 
 export function ExperiencePymeForm() {
   const dispatch = useDispatch()
   const router = useRouter()
+  const theme = useSelector((state: any) => state.account.theme)
+  const company = useSelector((state: any) => state.account.company)
 
   const form = useForm<zInfer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      mainColor: '',
-      fontFamily: '',
-      logo: '',
+      estimatedUsers: theme.estimatedUsers,
     }
   })
 
   async function onSubmit(values: zInfer<typeof formSchema>) {
-    dispatch(setTheme({
-      mainColor: values.mainColor,
-      fontFamily: values.fontFamily,
-      estimatedUsers: values.estimatedUsers.toString(),
-    }))
-
-    if (values.mainColor !== '' && values.fontFamily !== '' && values.logo !== '') {
+    dispatch(setEstimatedUsers(values.estimatedUsers.toString()))
+    
+    if (theme.mainColor !== '' && company.logo !== '' && theme.estimatedUsers !== '') {
       dispatch(increment())
       router.push('/account/config/seleccionar-suscripcion')
     }
@@ -57,6 +50,12 @@ export function ExperiencePymeForm() {
       label: 'Logo de su empresa',
       placeholder: 'Ej: https://www.example.com/logo.png',
       type: 'file',
+    },
+    {
+      name: 'estimatedUsers',
+      label: 'Cantidad de colaboradores estimados',
+      placeholder: 'Ej: 10',
+      type: 'text',
     }
   ]
 
