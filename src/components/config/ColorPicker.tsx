@@ -33,7 +33,7 @@ export default function SimpleColorSelector() {
     setColor(newColor)
     setRgbValue(hexToRgb(newColor))
     dispatch(setColorTheme(newColor))
-  }, [])
+  }, [dispatch])
 
   const handleRgbChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newRgb = event.target.value
@@ -41,7 +41,8 @@ export default function SimpleColorSelector() {
     if (newRgb.match(/^rgb$$\d+,\s*\d+,\s*\d+$$$/)) {
       setColor(rgbToHex(newRgb))
     }
-  }, [])
+    dispatch(setColorTheme(rgbToHex(newRgb)))
+  }, [dispatch])
 
   return (
     <div className="flex items-end">
