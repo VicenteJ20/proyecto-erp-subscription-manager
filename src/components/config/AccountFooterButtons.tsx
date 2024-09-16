@@ -27,6 +27,11 @@ const formIdByRoute = [
     slice: 'subscription'
   },
   {
+    route: '/account/config/confirmacion-de-suscripcion',
+    id: 'subscriptionConfirmationForm',
+    slice: 'subscriptionConfirmation'
+  },
+  {
     route: '/account/config/terminos-condiciones',
     id: 'termsForm',
     slice: 'terms'
