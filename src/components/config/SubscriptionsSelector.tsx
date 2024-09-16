@@ -7,40 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import Link from 'next/link'
 import { RiBankCard2Line } from '@remixicon/react'
+import { SUBSCRIPTIONS } from '@/constants/SUBSCRIPTIONS'
 
-const subscriptions = [
-  {
-    type: "Básico",
-    monthlyPrice: 25.000,
-    yearlyPrice: 99.99,
-    features: [
-      "Organiza a tu equipo",
-      "Organiza tu inventario, proveedores y más",
-      "Hasta 10 colaboradores"
-    ]
-  },
-  {
-    type: "Estándar",
-    monthlyPrice: 45.000,
-    yearlyPrice: 199.99,
-    features: [
-      "Todo lo incluído en el plan básico",
-      "Conecta con proveedores a través de la plataforma",
-      "Únete a una red interna de PYMES que usa el servicio y conviérte en proveedor",
-      "Hasta 50 colaboradores"
-    ]
-  },
-  {
-    type: "Empresas",
-    monthlyPrice: 125.000,
-    yearlyPrice: 90.000,
-    features: [
-      "Plan personalizado",
-      "Usuarios ilimitados",
-      "Instancias dedicadas en tu región"
-    ]
-  }
-]
 
 export default function SubscriptionSelector() {
   const [isYearly, setIsYearly] = useState(false)
@@ -69,7 +37,7 @@ export default function SubscriptionSelector() {
           <span className="text-sm font-medium">Anual</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {subscriptions.map((sub, index) => (
+          {SUBSCRIPTIONS.map((sub, index) => (
             <Card key={index} className="flex flex-col">
               <CardHeader>
                 <CardTitle>{sub.type}</CardTitle>
@@ -102,7 +70,7 @@ export default function SubscriptionSelector() {
               {
                 selectedPlan !== '' && (
                   <>
-                    El plan seleccionado <strong>{selectedPlan}</strong> tiene un precio de {isYearly ? 'anual' : 'mensual'} de {subscriptions.find(sub => sub.type === selectedPlan)![isYearly ? 'yearlyPrice' : 'monthlyPrice'].toFixed(3)} CLP que serán cargados a tu cuenta de manera {isYearly ? 'anual' : 'mensual'} una vez finalice la prueba gratuita. Serás redirigido a la pasarela de pagos de mercado pago para completar la transcacción. ¿Deseas continuar?
+                    El plan seleccionado <strong>{selectedPlan}</strong> tiene un precio de {isYearly ? 'anual' : 'mensual'} de {SUBSCRIPTIONS.find(sub => sub.type === selectedPlan)![isYearly ? 'yearlyPrice' : 'monthlyPrice'].toFixed(3)} CLP que serán cargados a tu cuenta de manera {isYearly ? 'anual' : 'mensual'} una vez finalice la prueba gratuita. Serás redirigido a la pasarela de pagos de mercado pago para completar la transcacción. ¿Deseas continuar?
                   </>
                 )
               }
