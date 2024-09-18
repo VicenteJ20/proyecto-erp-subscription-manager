@@ -13,6 +13,7 @@ const ChangeBtn = ({id}: { id: string}) => {
     dispatch(decrement())
   }
 
+  if (id === 'subscriptionConfirmationForm') return
 
   return (
     <section className='w-full px-12 py-6 gap-2 flex flex-row-reverse'>
