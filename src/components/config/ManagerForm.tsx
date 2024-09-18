@@ -21,14 +21,19 @@ export function ManagerForm({ email }: { email?: string }) {
   const dispatch = useDispatch()
   const router = useRouter()
 
+  const storedValues = JSON.parse(localStorage.getItem('manager') || '{}');
+  const defaultValues = {
+    email: storedValues.email || email || '',
+    name: storedValues.name || '',
+    phone: storedValues.phone || ''
+  };
+
+
   const form = useForm<zInfer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: email || '',
-      name: '',
-      phone: ''
-    }
-  })
+    defaultValues
+  });
+
 
   async function onSubmit(values: zInfer<typeof formSchema>) {
     dispatch(setManager({
