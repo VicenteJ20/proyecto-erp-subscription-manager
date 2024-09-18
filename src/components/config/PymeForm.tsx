@@ -28,20 +28,23 @@ export function PymeForm() {
   const dispatch = useDispatch()
   const router = useRouter()
 
+  const storedValues = JSON.parse(localStorage.getItem('company') || '{}');
+  const defaultValues = {
+    email: storedValues.email || '',
+    name: storedValues.name || '',
+    phone: storedValues.phone || '',
+    address: storedValues.address || '',
+    city: storedValues.city || '',
+    country: storedValues.country || '',
+    postalCode: storedValues.postalCode || '',
+    website: storedValues.website || '',
+    domain: storedValues.domain || ''
+  };
+
   const form = useForm<zInfer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      name: '',
-      phone: '',
-      address: '',
-      city: '',
-      country: '',
-      postalCode: '',
-      website: '',
-      domain: ''
-    }
-  })
+    defaultValues
+  });
 
   async function onSubmit(values: zInfer<typeof formSchema>) {
     dispatch(setCompany({
