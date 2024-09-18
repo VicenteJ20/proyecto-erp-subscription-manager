@@ -14,7 +14,7 @@ import FileUpload from "./FileUpload";
 
 
 const formSchema = z.object({
-   estimatedUsers: z.string({ message: 'Debe ingresar la cantidad de colaboradores estimados' }),
+  estimatedUsers: z.string({ message: 'Debe ingresar la cantidad de colaboradores estimados' }),
 })
 
 export function ExperiencePymeForm() {
@@ -23,16 +23,19 @@ export function ExperiencePymeForm() {
   const theme = useSelector((state: any) => state.account.theme)
   const company = useSelector((state: any) => state.account.company)
 
+  const storedValues = JSON.parse(localStorage.getItem('theme') || '{}');
+  const defaultValues = {
+    estimatedUsers: storedValues.estimatedUsers || theme.estimatedUsers || '',
+  };
+
   const form = useForm<zInfer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      estimatedUsers: theme.estimatedUsers,
-    }
-  })
+    defaultValues
+  });
 
   async function onSubmit(values: zInfer<typeof formSchema>) {
     dispatch(setEstimatedUsers(values.estimatedUsers.toString()))
-    
+
     if (theme.mainColor !== '' && company.logo !== '' && theme.estimatedUsers !== '') {
       dispatch(increment())
       router.push('/account/config/seleccionar-suscripcion')
