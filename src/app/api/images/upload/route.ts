@@ -40,7 +40,13 @@ export const POST = auth(async (req) => {
         path.join(companyFolder, filename),
         Buffer.from(buffer)
       )
-      return NextResponse.json({ message: "Upload successful", url: `${mainRoute}/${company}/${filename}` }, { status: 201 })
+      let returnRoute = `${mainRoute}/${company}/${filename}`
+      
+      if (returnRoute.includes('/public/assets/')) {
+        returnRoute = returnRoute.replace('/public', '');
+      }
+
+      return NextResponse.json({ message: "Upload successful", url: `${returnRoute}` }, { status: 201 })
     } catch (error: any) {
       console.error("Error writing file:", error)
       return NextResponse.json({ message: "Upload failed", error: error.message }, { status: 500 })
