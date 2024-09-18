@@ -24,10 +24,11 @@ function rgbToHex(rgb: string): string {
 }
 
 export default function SimpleColorSelector() {
-  const [color, setColor] = useState("#ff0000")
-  const [rgbValue, setRgbValue] = useState("rgb(255, 0, 0)")
+  const localColor = JSON.parse(localStorage.getItem('theme') || '{}')
+  const [color, setColor] = useState(localColor.mainColor || "#FF0000")
+  const [rgbValue, setRgbValue] = useState(hexToRgb(color))
   const dispatch = useDispatch()
-
+  
   const handleColorChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = event.target.value
     setColor(newColor)

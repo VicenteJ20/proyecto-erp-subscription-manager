@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+'use client'
+
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -15,7 +17,19 @@ export default function ImageUploader({ label }: { label: string }) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const dispatch = useDispatch();
   const experience = useSelector((state: any) => state.account.company);
-  const color = useSelector((state: any) => state.account.theme);
+
+  useEffect(() => {
+    const storedImageUrl = JSON.parse(localStorage.getItem('logoUrl') || '{}');
+    if (storedImageUrl) {
+      setImagePreview(storedImageUrl.url);
+      fetch(storedImageUrl.url)
+        .then(res => res.blob())
+        .then(blob => {
+          const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
+          setFile(file);
+        });
+    }
+  }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -54,7 +68,8 @@ export default function ImageUploader({ label }: { label: string }) {
       let data;
       try {
         data = JSON.parse(responseText);
-        dispatch(setLogoUrl(response.url));
+        dispatch(setLogoUrl(data.url));
+        localStorage.setItem('logoUrl', JSON.stringify({ url: data.url }));
       } catch (parseError) {
         throw new Error(`Failed to parse server response: ${responseText}`);
       }
@@ -62,7 +77,7 @@ export default function ImageUploader({ label }: { label: string }) {
       if (response.ok) {
         setMessage('Imagen cargada exitosamente: ' + data.message);
       } else {
-        setMessage('Error al cargar la imagen: ' + (data.message || 'Unknown error'));
+        setMessage('Error al cargar la imagen: ' + (data.message || 'Error desconocido'));
       }
     } catch (error: any) {
       setMessage('Error: ' + error.message);
