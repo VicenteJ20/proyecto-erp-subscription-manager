@@ -24,7 +24,6 @@ export default function SubscriptionSelector() {
     locale: 'es-CL',
   })
 
-  console.log(preferenceId)
   const handleOpenDialog = () => {
     if (triggerRef.current) {
       triggerRef.current.click()
@@ -34,6 +33,7 @@ export default function SubscriptionSelector() {
   const handleSubscriptionSelector = (sub: any) => {
     handleOpenDialog()
     setSelectedPlan(sub.type)
+    localStorage.setItem('subscription', JSON.stringify(sub))
   }
 
   const handlePreference = async (plan: string) => {
@@ -49,7 +49,7 @@ export default function SubscriptionSelector() {
         },
         body: JSON.stringify({
           subscriptionId: sub.type,
-          userEmail: 'vicente@gmail.cl' || company.email || manager.email,
+          userEmail: company.email || manager.email,
           paymentMode: isYearly ? 'yearly' : 'monthly'
         })
       })
@@ -63,6 +63,11 @@ export default function SubscriptionSelector() {
       console.error(error)
     }
   }
+
+  const formatAmount = (amount: number, currency: string, locale: string) => {
+    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount)
+  }
+
   return (
     <>
       <div className="container mx-auto px-4 py-4">
@@ -80,7 +85,7 @@ export default function SubscriptionSelector() {
               <CardHeader>
                 <CardTitle>{sub.type}</CardTitle>
                 <CardDescription>
-                  {isYearly ? `${sub.yearlyPrice.toFixed(3)} CLP/año` : `${sub.monthlyPrice.toFixed(3)} CLP/mes`}
+                  {isYearly ? `${formatAmount(sub.yearlyPrice, 'CLP', 'es-CL')} CLP/año` : `${formatAmount(sub.monthlyPrice, 'CLP', 'es-CL')} CLP/mes`}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow text-sm">
@@ -108,7 +113,7 @@ export default function SubscriptionSelector() {
               {
                 selectedPlan !== '' && (
                   <>
-                    El plan seleccionado <strong>{selectedPlan}</strong> tiene un precio de {isYearly ? 'anual' : 'mensual'} de {SUBSCRIPTIONS.find(sub => sub.type === selectedPlan)![isYearly ? 'yearlyPrice' : 'monthlyPrice']} CLP que serán cargados a tu cuenta de manera {isYearly ? 'anual' : 'mensual'} una vez finalice la prueba gratuita. Serás redirigido a la pasarela de pagos de mercado pago para completar la transcacción. ¿Deseas continuar?
+                    El plan seleccionado <strong>{selectedPlan}</strong> tiene un precio de {formatAmount(SUBSCRIPTIONS.find(sub => sub.type === selectedPlan)![isYearly ? 'yearlyPrice' : 'monthlyPrice'], 'CLP', 'es-CL')} CLP que serán cargados a tu cuenta de manera {isYearly ? 'anual' : 'mensual'} una vez finalice el periodo de prueba de 30 días donde solo pagas el 10% de la suscripción seleccionado. Serás redirigido a la pasarela de pagos de mercado pago para completar la transcacción. ¿Deseas continuar?
                   </>
                 )
               }
