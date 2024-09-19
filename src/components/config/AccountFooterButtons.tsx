@@ -139,7 +139,6 @@ const AccountFooterButtons = () => {
     if (pathname === '/account/config/confirmacion-de-suscripcion') {
       const currentStage = checkLocalStorage();
       dispatch(set(currentStage));
-      console.log('currentStage', currentStage)
     }
     if (previousRoute && !isPreviousStageComplete(previousRoute.slice, oldSlice)) {
       router.push(previousRoute.route);
