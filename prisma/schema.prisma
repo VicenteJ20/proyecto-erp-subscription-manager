@@ -2,26 +2,27 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
- 
+
 generator client {
   provider = "prisma-client-js"
 }
- 
+
 model User {
   id            String          @id @default(cuid())
   name          String?
   email         String          @unique
   emailVerified DateTime?
+  phone         String?
   image         String?
   accounts      Account[]
   sessions      Session[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
- 
+
 model Account {
   userId            String
   type              String
@@ -34,33 +35,37 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+
   @@id([provider, providerAccountId])
 }
- 
+
 model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
 }
- 
+
 model VerificationToken {
   identifier String
   token      String
   expires    DateTime
- 
+
   @@id([identifier, token])
 }
- 
+
 // Optional for WebAuthn support
 model Authenticator {
   credentialID         String  @unique
@@ -71,8 +76,77 @@ model Authenticator {
   credentialDeviceType String
   credentialBackedUp   Boolean
   transports           String?
- 
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
+  Company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+
   @@id([userId, credentialID])
+}
+
+model Company {
+  id             String          @id @default(cuid())
+  name           String
+  email          String          @unique
+  emailVerified  DateTime?
+  phone          String
+  city           String
+  country        String
+  postalCode     String
+  website        String
+  logo           String
+  domain         String
+  address        String
+  estimatedUsers Int?
+  accounts       Account[]
+  sessions       Session[]
+  // Optional for WebAuthn support
+  Authenticator  Authenticator[]
+
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  PaymentInfo          PaymentInfo[]
+  SubscriptionSelected SubscriptionSelected[]
+}
+
+model ThemeOptions {
+  id        String @id @default(cuid())
+  companyId String
+  mainColor String
+}
+
+model SubscriptionSelected {
+  id           String   @id @default(cuid())
+  type         String
+  monthlyPrice Int
+  yearlyPrice  Int
+  features     String[]
+  companyId    String
+  managerId    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Company Company @relation(fields: [companyId], references: [id])
+}
+
+model PaymentInfo {
+  id                String  @id @default(cuid())
+  collectionId      String
+  collectionStatus  String
+  paymentId         String
+  status            String
+  externalReference String?
+  paymentType       String
+  merchantOrderId   String
+  preferenceId      String
+  siteId            String
+  processingMode    String
+  merchantAccountId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
 }
