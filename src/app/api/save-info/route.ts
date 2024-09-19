@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 
 export const POST = auth(async (req, res) => {
-  const session =  req.auth
+  const session = req.auth
 
   console.log(session)
 
   const { manager, company, logoUrl, theme, subscription, paymentinfo } = await req.json()
 
   try {
-    await prisma.company.create({
+    const cpn = await prisma.company.create({
       data: {
         name: company.name,
         email: company.email,
@@ -47,16 +48,39 @@ export const POST = auth(async (req, res) => {
     await prisma.subscriptionSelected.create({
       data: {
         type: subscription.type,
-        monthlyPrice: subscription.type,
-        yearlyPrice: subscription.type,
+        monthlyPrice: subscription.monthlyPrice,
+        yearlyPrice: subscription.yearlyPrice,
         features: subscription.features,
-        companyId: company.name,
+        companyId: cpn.id,
         managerId: manager.email,
       }
     })
 
-    return NextResponse.json({ message: "Data saved" }, { status : 201 })
+    await prisma.paymentInfo.create({
+      data: {
+        collectionId: paymentinfo.collectionId,
+        collectionStatus: paymentinfo.collectionStatus,
+        paymentId: paymentinfo.paymentId,
+        status: paymentinfo.status,
+        externalReference: paymentinfo.externalReference,
+        paymentType: paymentinfo.paymentType,
+        merchantOrderId: paymentinfo.merchantOrderId,
+        preferenceId: paymentinfo.preferenceId,
+        siteId: paymentinfo.siteId,
+        processingMode: paymentinfo.processingMode,
+        merchantAccountId: paymentinfo.merchantAccountId,
+        companyId: cpn.id,
+      }
+    })
+
+    return NextResponse.json({ message: "Data saved" }, { status: 201 })
   } catch (error: any) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        return NextResponse.json({ message: 'Compañía ya registrada', error: error.message }, { status: 400 })
+      }
+      return NextResponse.json({ message: 'Compañía ya registrada', error: error.message }, { status: 400 })
+    }
     return NextResponse.json({ message: "Error saving data", error: error.message }, { status: 500 })
   }
 
