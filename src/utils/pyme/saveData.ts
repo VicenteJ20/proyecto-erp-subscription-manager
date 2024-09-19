@@ -1,6 +1,4 @@
-import { prisma } from "@/lib/prisma"
-
-interface SaveDataProps {
+export interface SaveDataProps {
   manager: {
     email: string,
     name: string,
@@ -27,9 +25,20 @@ interface SaveDataProps {
     preferenceId: string,
   }
   paymentinfo: {
-    status: string,
+    collectionId: string,
+    collectionStatus: string,
     paymentId: string,
-    payerId: string
+    status:   string,
+    externalReference: string,
+    paymentType: string,
+    merchantOrderId: string,
+    paymentMethodId: string,
+    preferenceId: string,
+    siteId: string,
+    processingMode: string,
+    merchantAccountId: string,
+
+    companyId: string,
   }
 }
 
