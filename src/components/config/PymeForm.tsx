@@ -9,7 +9,9 @@ import { useDispatch } from "react-redux";
 import { setCompany, setManager } from "@/redux/features/account/accountSlice";
 import { useRouter } from "next/navigation";
 import { increment } from "@/redux/features/account/stageSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { CheckExistence } from "@/utils/validations/existence";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 
 
 const formSchema = z.object({
@@ -27,6 +29,9 @@ const formSchema = z.object({
 export function PymeForm() {
   const dispatch = useDispatch()
   const router = useRouter()
+  const readManager = JSON.parse(localStorage.getItem('manager') || '{}');
+  const [checkState, setCheckState] = useState() as any
+  const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
 
   const storedValues = JSON.parse(localStorage.getItem('company') || '{}');
   const defaultValues = {
@@ -47,6 +52,19 @@ export function PymeForm() {
   });
 
   async function onSubmit(values: zInfer<typeof formSchema>) {
+
+    // check if the company exists first
+    const checkCompany = await CheckExistence(values.name, values.email, readManager.email)
+
+    if (checkCompany?.status === 400) {
+      setCheckState({
+        title: '¡Algo salió mal!',
+        message: checkCompany.message
+      })
+      setIsAlertDialogOpen(true)
+      return
+    }
+
     dispatch(setCompany({
       email: values.email,
       name: values.name,
@@ -140,6 +158,21 @@ export function PymeForm() {
           }
         </form>
       </Form>
+      {
+        checkState && (
+          <AlertDialog open={isAlertDialogOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{checkState.title}</AlertDialogTitle>
+                <AlertDialogDescription>{checkState.message}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setIsAlertDialogOpen(!isAlertDialogOpen)}>Cancel</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )
+      }
     </>
   )
 }
